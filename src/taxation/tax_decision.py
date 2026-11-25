@@ -63,9 +63,15 @@ def evaluate_tax_treatment(
         income_status = "UNSUPPORTED"
         can_calculate_income_tax = False
 
-    # Decisao sobre IOF
+        # Decisao sobre IOF
     if profile.iof_policy == IofPolicy.REGRESSIVE_WHEN_APPLICABLE:
-        if iof_applicable is True:
+        if (
+            profile.requires_operation_review
+            and not operation_review_confirmed
+        ):
+            iof_status = "REVIEW_REQUIRED"
+            can_calculate_iof = False
+        elif iof_applicable is True:
             iof_status = "READY"
             can_calculate_iof = True
         elif iof_applicable is False:

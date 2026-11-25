@@ -141,3 +141,23 @@ def test_fixed_income_products_allow_income_tax_calculation(product):
 def test_unknown_product_is_rejected():
     with pytest.raises(ValueError):
         evaluate_tax_treatment("FUND")
+
+def test_tesouro_requires_operation_review_for_iof():
+    result = evaluate_tax_treatment(
+        "TESOURO_DIRETO",
+        operation_review_confirmed=False,
+        iof_applicable=True,
+    )
+
+    assert result.iof_status == "REVIEW_REQUIRED"
+    assert result.can_calculate_iof is False
+
+def test_tesouro_allows_iof_after_operation_review():
+    result = evaluate_tax_treatment(
+        "TESOURO_DIRETO",
+        operation_review_confirmed=True,
+        iof_applicable=True,
+    )
+
+    assert result.iof_status == "READY"
+    assert result.can_calculate_iof is True
